@@ -14,7 +14,13 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@libs/captcha": ["libs/invoice/captcha/src/index.ts"],
+      "@libs/invoice-checker": ["libs/invoice/invoice-checker/src/index.ts"],
+      "@libs/llm-parser": ["libs/invoice/llm-parser/src/index.ts"],
+      "@libs/supabase": ["libs/shared/supabase/src/index.ts"],
+      "@libs/upload": ["libs/invoice/upload/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,0 +1,9 @@
+{
+  "name": "invoice-checker",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/invoice/invoice-checker/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project invoice-checker --web",
+  "targets": {}
+}
