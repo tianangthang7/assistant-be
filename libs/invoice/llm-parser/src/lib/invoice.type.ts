@@ -21,13 +21,11 @@ export const InvoiceSchema = {
       },
       total_tax: {
         type: 'string',
-        pattern: '^\\d{1,3}(\\.\\d{3})*(,\\d{2})?$',
-        description: 'Total tax amount in format (e.g., 75.916,05)',
+        description: 'Total tax amount , float number',
       },
       total_bill: {
         type: 'string',
-        pattern: '^\\d{1,3}(\\.\\d{3})*(,\\d{2})?$',
-        description: 'Total bill amount in format (e.g., 75.916,05)',
+        description: 'Total bill amount , float number',
       },
     },
     required: [
@@ -53,4 +51,5 @@ export type InvoiceDto = {
   file_id: string;
   validity_checked_at: Date;
   validity_message: string;
+  updated_at: Date;
 };

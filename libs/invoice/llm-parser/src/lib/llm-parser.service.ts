@@ -53,32 +53,6 @@ export class LlmParserService {
     }
   }
 
-  async saveToSupabase(
-    file: FileDto,
-    invoice: InvoiceDto[]
-  ): Promise<InvoiceDto[]> {
-    const mappedInvoices = invoice.map((invoice) => ({
-      invoice_number: invoice.invoice_number,
-      invoice_symbol: invoice.invoice_symbol,
-      tax_code: invoice.tax_code,
-      total_tax: invoice.total_tax,
-      total_bill: invoice.total_bill,
-      is_valid: invoice.is_valid,
-      status: 'pending',
-      validity_message: invoice.validity_message,
-      validity_checked_at: invoice.validity_checked_at,
-      file_id: file.id,
-    }));
-    const { data, error } = await this.supabase.client
-      .from('invoices')
-      .insert(mappedInvoices)
-      .select();
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
-  }
-
   async parse(file: FileDto) {
     // download file from supabase
     const { data, error } = await this.supabase.client.storage
@@ -122,10 +96,8 @@ export class LlmParserService {
       contents,
       config,
     });
+    const invoices = JSON.parse(response.text || '[]') as InvoiceDto[];
 
-    // save to supabase
-    const invoice = JSON.parse(response.text || '[]') as InvoiceDto[];
-    const savedInvoices = await this.saveToSupabase(file, invoice);
-    return savedInvoices;
+    return invoices;
   }
 }

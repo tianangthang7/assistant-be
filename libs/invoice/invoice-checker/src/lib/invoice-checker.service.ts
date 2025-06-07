@@ -1,12 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InvoiceDto } from '@libs/llm-parser';
 import { CaptchaEntity, CaptchaService } from '@libs/captcha';
 import axios from 'axios';
 import * as https from 'https';
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+import { SupabaseService } from '@libs/supabase';
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
 @Injectable()
 export class InvoiceCheckerService {
-  constructor(private readonly captchaService: CaptchaService) {}
+  constructor(
+    private readonly captchaService: CaptchaService,
+    private readonly supabaseService: SupabaseService
+  ) {}
+
+  async save(invoice: InvoiceDto) {
+    const { data, error } = await this.supabaseService.client
+      .from('invoices')
+      .update(invoice)
+      .eq('id', invoice.id);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return {
+      message: 'Success',
+    };
+  }
 
   async check(invoice: InvoiceDto) {
     const captcha = await this.captchaService.parseCaptcha();
@@ -14,11 +32,19 @@ export class InvoiceCheckerService {
       return {
         ...invoice,
         is_valid: false,
-        validity_message: 'Error',
+        validity_message: 'Error captcha',
         validity_checked_at: new Date(),
       };
     }
-    return this.checkInvoice(invoice, captcha);
+    const checkedInvoice = await this.checkInvoice(invoice, captcha);
+    const { data, error } = await this.supabaseService.client
+      .from('invoices')
+      .update(checkedInvoice)
+      .eq('id', invoice.id);
+    if (error) {
+      Logger.error(error);
+    }
+    return checkedInvoice;
   }
 
   async checkInvoice(
@@ -42,7 +68,7 @@ export class InvoiceCheckerService {
       cvalue: captchaText,
       ckey: key,
     };
-
+    Logger.log('params', params);
     const response = await axios.get(url, { params, httpAgent: agent });
     if (response.data && 'hdon' in response.data && response.status === 200) {
       return {

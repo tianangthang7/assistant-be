@@ -14,4 +14,13 @@ export class InvoiceCheckerController {
       data: result,
     };
   }
+
+  @Post('save')
+  async save(@Body() invoice: InvoiceDto) {
+    const result = await this.invoiceCheckerService.save(invoice);
+    return {
+      message: 'Success',
+      data: result,
+    };
+  }
 }
